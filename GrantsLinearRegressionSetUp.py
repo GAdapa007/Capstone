@@ -29,8 +29,9 @@ else:
 
 #----------------------------------------------------------
 
-filelocation = sys.argv[0].replace("GrantsLinearRegressionSetUp.py", "")
-file_name = filelocation + 'Data\\grants.csv'
+# filelocation = sys.argv[0].replace("GrantsLinearRegressionSetUp.py", "")
+# file_name = filelocation + 'Data\\grants.csv'
+file_name = 'https://raw.githubusercontent.com/NickStitely/Capstone/refs/heads/LDBranch/Data/grants.csv'
 df = pd.read_csv(file_name)
 df.head()
 
