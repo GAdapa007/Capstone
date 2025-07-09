@@ -104,6 +104,33 @@ funding_amounts = sample_y.detach().cpu().numpy() if isinstance(sample_y, torch.
 for cat, fund in zip(categories, funding_amounts):
     print(f"Category: {cat} -> Estimated Funding: ${fund:,.2f}")
 
+
+from sklearn.linear_model import LinearRegression
+
+# Setup a Linear Regression from SKLearn
+model = LinearRegression()
+
+# Fit the training data. Had to reshape as this expects 2-D but don't remember this from similar training.?? 
+model.fit(train_data.tensors[0].reshape(-1, 1), train_data.tensors[1])
+
+# Print some details
+print(f'Intercept: {model.intercept_}')
+print(f'Score: {model.score(x_test.reshape(-1, 1), y_test)}')
+
+# Predictions
+y_pred = model.predict(x_test.reshape(-1, 1))
+
+# Reverse transform the categories back to text
+cats = le.inverse_transform(x_test)
+
+# Test the transform
+print(f'Category Test: {cats[1]}')
+
+# Check a Random Sample
+for i in range(10):
+    print(f'Category: {categories[x_test[i]]}, \t\tPredicted: {y_pred[i]:.2f}, \t\tActual: {y_test[i]:.2f}')
+
+
 #---------------------------------------------------------------------------------------
 #model creation and validation
 
