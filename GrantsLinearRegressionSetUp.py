@@ -127,8 +127,8 @@ cats = le.inverse_transform(x_test)
 print(f'Category Test: {cats[1]}')
 
 # Check a Random Sample
-for i in range(10):
-    print(f'Category: {cats[x_test[i]]}, \t\tPredicted: {y_pred[i]:.2f}, \t\tActual: {y_test[i]:.2f}')
+# for i in range(10):
+    # print(f'Category: {cats[x_test[i]]}, \t\tPredicted: {y_pred[i]:.2f}, \t\tActual: {y_test[i]:.2f}')
 
 
 
@@ -145,8 +145,8 @@ mask_train_y = (y_train <= 1000000000)
 mask_test_y = (y_test <= 1000000000)
 
 plt.figure(figsize=(16, 10))
-plt.scatter(le.inverse_transform(x_train[mask_train_y]), y_train[mask_train_y], color='blue', label='train', alpha=0.7)
-plt.scatter(le.inverse_transform(x_test[mask_test_y]), y_test[mask_test_y], color='red', label='train', alpha=0.7)
+plt.scatter(le.inverse_transform(x_train[mask_train_y]), y_train[mask_train_y], color='green', label='train', alpha=0.7)
+plt.scatter(le.inverse_transform(x_test[mask_test_y]), y_test[mask_test_y], color='blue', label='train', alpha=0.7)
 plt.title("Scatter Plot: Training")
 plt.xlabel("Categories")
 plt.ylabel("(Award Amounts (M))")
