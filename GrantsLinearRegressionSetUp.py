@@ -128,7 +128,7 @@ print(f'Category Test: {cats[1]}')
 
 # Check a Random Sample
 for i in range(10):
-    print(f'Category: {categories[x_test[i]]}, \t\tPredicted: {y_pred[i]:.2f}, \t\tActual: {y_test[i]:.2f}')
+    print(f'Category: {cats[x_test[i]]}, \t\tPredicted: {y_pred[i]:.2f}, \t\tActual: {y_test[i]:.2f}')
 
 
 #---------------------------------------------------------------------------------------
