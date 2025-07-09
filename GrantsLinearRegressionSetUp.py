@@ -131,6 +131,61 @@ for i in range(10):
     print(f'Category: {cats[x_test[i]]}, \t\tPredicted: {y_pred[i]:.2f}, \t\tActual: {y_test[i]:.2f}')
 
 
+
+
+# Plot Things
+
+def hundreds_of_millions(x, pos):
+    return f'{x / 1:.1f}'
+
+max_y = max(y_train)
+
+# cut off the billions and above - not a big deal for the graph but the few awards of 178 billion are insane to try and plot. Even up to 1 billion is not great
+mask_train_y = (y_train <= 1000000000)
+mask_test_y = (y_test <= 1000000000)
+
+plt.figure(figsize=(16, 10))
+plt.scatter(le.inverse_transform(x_train[mask_train_y]), y_train[mask_train_y], color='blue', label='train', alpha=0.7)
+plt.scatter(le.inverse_transform(x_test[mask_test_y]), y_test[mask_test_y], color='red', label='train', alpha=0.7)
+plt.title("Scatter Plot: Training")
+plt.xlabel("Categories")
+plt.ylabel("(Award Amounts (M))")
+plt.grid(True)
+plt.gca().yaxis.set_major_formatter(plt.FuncFormatter(hundreds_of_millions))
+plt.xticks(rotation=90)
+plt.show()
+
+
+
+# Show the predictions
+mask_pred_y = (y_pred <= 100000000)
+
+plt.figure(figsize=(16, 6))
+plt.scatter(le.inverse_transform(x_test), y_pred, color='red', label='pred', alpha=0.7)
+plt.title("Scatter Plot: Predictions")
+plt.xlabel("Categories")
+plt.ylabel("(Award Amounts (M))")
+plt.grid(True)
+plt.gca().yaxis.set_major_formatter(plt.FuncFormatter(hundreds_of_millions))
+plt.xticks(rotation=90)
+plt.show()
+
+
+# End Model Creation Here
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #---------------------------------------------------------------------------------------
 #model creation and validation
 
