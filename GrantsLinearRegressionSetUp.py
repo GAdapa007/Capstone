@@ -146,7 +146,7 @@ mask_test_y = (y_test <= 1000000000)
 
 plt.figure(figsize=(16, 10))
 plt.scatter(le.inverse_transform(x_train[mask_train_y]), y_train[mask_train_y], color='green', label='train', alpha=0.7)
-plt.scatter(le.inverse_transform(x_test[mask_test_y]), y_test[mask_test_y], color='blue', label='train', alpha=0.7)
+# plt.scatter(le.inverse_transform(x_test[mask_test_y]), y_test[mask_test_y], color='blue', label='train', alpha=0.7) # need to sort all 4 arrays to do this, maybe do train / test side by side as well instead of overlap. Not important but would be cool
 plt.title("Scatter Plot: Training")
 plt.xlabel("Categories")
 plt.ylabel("(Award Amounts (M))")
