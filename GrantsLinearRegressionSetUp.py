@@ -141,6 +141,38 @@ for cat, fund in zip(categories, funding_amounts):
 from sklearn.linear_model import LinearRegression
 
 #----------------------------------------------------------------------------------------------------------------
+#---------------------------------------PRINT HELPERS------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------------------
+# Define an object to print the Predictions
+class PredictionHolder:
+  def __init__(self, num, category, predicted):
+    self.num = num
+    self.category = category
+    self.predicted = predicted
+
+class DistinctPredictions:
+  def __init__(self, categoryLookups, x, y, predType):
+    self.categoryLookups = categoryLookups
+    self.x = x
+    self.y = y
+    self.predType = predType
+
+  def printPredictions(self):
+    objects = [0]*26
+
+    for i in range(len(self.x)):
+      curX = self.x[i]
+      curY = self.y[i]
+
+      newObj = PredictionHolder(curX, self.categoryLookups[i], curY)
+
+      if(objects[curX] == 0):
+        objects[curX] = newObj
+
+    print(f'Printing the {self.predType} Predictions')
+    for i in range(len(objects)):
+      if(objects[i] != 0):
+        print(f'X Value: {objects[i].num}, \t\t Category: {objects[i].category}, \t\tPredicted: {objects[i].predicted}')
 
 
 
@@ -151,7 +183,7 @@ from sklearn.linear_model import LinearRegression
 # Setup a Linear Regression from SKLearn
 model = LinearRegression()
 
-# Fit the training data. Had to reshape as this expects 2-D but don't remember this from similar training.?? 
+# Fit the training data. Had to reshape as this expects 2-D
 model.fit(train_data.tensors[0].reshape(-1, 1), train_data.tensors[1])
 
 # Print some details
@@ -169,9 +201,6 @@ print(f'Category Test: {cats[1]}')
 
 
 
-
-
-
 # Plot Things
 
 def hundreds_of_millions(x, pos):
@@ -185,7 +214,6 @@ mask_test_y = (y_test <= 1000000000)
 
 plt.figure(figsize=(16, 10))
 plt.scatter(le.inverse_transform(x_train[mask_train_y]), y_train[mask_train_y], color='green', label='train', alpha=0.7)
-# plt.scatter(le.inverse_transform(x_test[mask_test_y]), y_test[mask_test_y], color='blue', label='train', alpha=0.7) # need to sort all 4 arrays to do this, maybe do train / test side by side as well instead of overlap. Not important but would be cool
 plt.title("Scatter Plot: Training")
 plt.xlabel("Categories")
 plt.ylabel("(Award Amounts (M))")
@@ -197,11 +225,14 @@ plt.show()
 
 
 # Show the predictions
-mask_pred_y = (y_pred <= 100000000)
+x_axis_linear = le.inverse_transform(x_test)
+y_axis_linear = y_pred;
+df_linear = pd.DataFrame({ 'x' : x_axis_linear, 'y' : y_axis_linear })
+df_linear_sorted = df_linear.sort_values('y')
 
 plt.figure(figsize=(16, 6))
-plt.scatter(le.inverse_transform(x_test), y_pred, color='red', label='pred', alpha=0.7)
-plt.title("Scatter Plot: Predictions")
+plt.scatter(df_linear_sorted['x'], df_linear_sorted['y'], color='red', label='pred', alpha=0.7)
+plt.title("Scatter Plot: LINEAR Regression Predictions")
 plt.xlabel("Categories")
 plt.ylabel("(Award Amounts (M))")
 plt.grid(True)
@@ -211,22 +242,6 @@ plt.show()
 
 
 # End Model Creation Here
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#----------------------------------------------------------------------------------------------------------------
-
 
 
 
@@ -263,3 +278,69 @@ plt.grid(True)
 plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--')  # perfect line
 plt.show()
 #------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------------
+#----------------------------------------Attempt a Lasso Regression (No reason we still only use one feature------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------------------------------------------
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import RepeatedKFold
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.linear_model import Lasso
+from sklearn.linear_model import LassoCV
+import numpy as np
+
+scaler = StandardScaler().fit(train_data.tensors[0].reshape(-1, 1))
+
+# Scale Train and Test X
+x_train_scaled = scaler.transform(train_data.tensors[0].reshape(-1, 1))
+x_test_scaled  = scaler.transform(x_test.reshape(-1, 1))
+
+
+cv = RepeatedKFold(n_splits = 3, n_repeats = 15, random_state = 42)
+alphas = np.logspace(-5, 0, 50)
+
+
+lasso_cv = LassoCV(alphas=alphas, cv=cv, max_iter=20000).fit(x_train_scaled, train_data.tensors[1])
+print("Best alpha:", lasso_cv.alpha_)
+
+best_pred_lasso = lasso_cv.predict(x_test_scaled)
+print("Tuned Test MSE:", mean_squared_error(y_test, best_pred_lasso))
+print("Non-zero coefficients:", np.sum(lasso_cv.coef_ != 0))
+
+
+# Plot the Lasso Predictions
+x_axis_lasso = le.inverse_transform(x_test)
+y_axis_lasso = best_pred_lasso;
+
+df_lasso = pd.DataFrame({ 'x' : x_axis_lasso, 'y' : y_axis_lasso })
+df_lasso_sorted = df_lasso.sort_values('y')
+
+plt.figure(figsize=(16, 6))
+plt.scatter(df_lasso_sorted['x'], df_lasso_sorted['y'], color='green', label='pred', alpha=0.7)
+plt.title("Scatter Plot: LASSO Regression Predictions")
+plt.xlabel("Categories")
+plt.ylabel("(Award Amounts (M))")
+plt.grid(True)
+plt.gca().yaxis.set_major_formatter(plt.FuncFormatter(hundreds_of_millions))
+plt.xticks(rotation=90)
+plt.show()
+
+
+
+
+DistinctPredictions(cats, x_test, y_pred, 'Linear Regression').printPredictions()
+print('======================================================================================================================================')
+DistinctPredictions(x_axis_lasso, x_test, best_pred_lasso, 'Lasso Regression Repeated').printPredictions()
